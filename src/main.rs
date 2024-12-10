@@ -11,10 +11,18 @@ fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
+pub fn logo() {
+    println!(r" _____           _    ____   _____ ");
+    println!(r"|  __ \         | |  / __ \ / ____|");
+    println!(r"| |__) |   _ ___| |_| |  | | (___  ");
+    println!(r"|  _  / | | / __| __| |  | |\___ \ ");
+    println!(r"| | \ \ |_| \__ \ |_| |__| |____) |");
+    println!(r"|_|  \_\__,_|___/\__|\____/|_____/ ");  
+}
+
 #[no_mangle]
 pub extern "C" fn _start() -> ! {
-    println!("Hello World{}", "!");
-    panic!("Some info");
-    
+    logo();
+
     loop {}
 }
