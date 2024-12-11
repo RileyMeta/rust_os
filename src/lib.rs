@@ -9,8 +9,12 @@ pub mod serial;
 pub mod vga_buffer;
 pub mod interrupts;
 pub mod gdt;
+pub mod memory;
 
 use core::panic::PanicInfo;
+
+#[cfg(test)]
+use bootloader::{entry_point, BootInfo};
 
 use x86_64::instructions::hlt;
 
@@ -52,10 +56,13 @@ pub fn init() {
     x86_64::instructions::interrupts::enable();
 }
 
+#[cfg(test)]
+entry_point!(test_kernel_main);
+
 // Entry point for 'cargo test'
 #[cfg(test)]
-#[no_mangle]
-pub extern "C" fn _start() -> ! {
+fn test_kernel_main(_boot_info: &'static BootInfo) -> ! {
+
     init();
     test_main();
     hlt_loop();
