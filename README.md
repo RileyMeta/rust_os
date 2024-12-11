@@ -1,5 +1,7 @@
 # rust_os
 A simple x86 Operating System written in Rust
+> [!note]
+> based on [Philipp Oppermann's blog](https://os.phil-opp.com)
 
 ## Necessary Files
 ```
