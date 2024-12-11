@@ -35,6 +35,8 @@ pub fn logo() {
 pub extern "C" fn _start() -> ! {
     logo();
     
+    rust_os::init()
+
     #[cfg(test)]
     test_main();
 
