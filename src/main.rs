@@ -13,7 +13,7 @@ mod serial;
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
     println!("{}", info);
-    loop {}
+    rust_os::htl_loop();
 }
 
 #[cfg(test)]
@@ -35,12 +35,13 @@ pub fn logo() {
 pub extern "C" fn _start() -> ! {
     logo();
     
-    rust_os::init()
+    rust_os::init();
 
     #[cfg(test)]
     test_main();
 
-    loop {}
+    println!("It did not crash!");
+    rust_os::htl_loop();
 }
 
 // Trivial Assertion is a basic test
