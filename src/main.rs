@@ -1,7 +1,7 @@
 #![no_std] // Specify no Standard Library
 #![no_main] // Specify no traditional main()
 #![feature(custom_test_frameworks)]
-#![test_runner(crate::test_runner)]
+#![test_runner(rust_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
@@ -16,22 +16,10 @@ fn panic(info: &PanicInfo) -> ! {
     loop {}
 }
 
-#[cfg(test)]        // Test Panic Handler (prints to serial out)
+#[cfg(test)]
 #[panic_handler]
 fn panic(info: &PanicInfo) -> ! {
-    serial_println!("[failed]\n");
-    serial_println!("Error: {}\n", info);
-    exit_qemu(QemuExitCode::Failed);
-    loop {}
-}
-
-#[cfg(test)]
-pub fn test_runner(tests: &[&dyn Testable]) {
-    serial_println!("Running {} tests", tests.len());
-    for test in tests {
-        test.run();
-    }
-    exit_qemu(QemuExitCode::Success);
+    rust_os::test_panic_handler(info)
 }
 
 pub fn logo() {
@@ -57,38 +45,4 @@ pub extern "C" fn _start() -> ! {
 #[test_case]
 fn trivial_assertion() {
     assert_eq!(1, 1);                   // Assert that 1 = 1
-}
-
-
-// QEMU EXIT
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-#[repr(u32)]
-pub enum QemuExitCode {
-    Success = 0x10,
-    Failed = 0x11,
-}
-
-pub fn exit_qemu(exit_code: QemuExitCode) {
-    use x86_64::instructions::port::Port;
-
-    unsafe {
-        let mut port = Port::new(0xf4);
-        port.write(exit_code as u32);
-    }
-}
-
-// Test Traits
-pub trait Testable {
-    fn run(&self) -> ();
-}
-
-impl<T> Testable for T
-where
-    T: Fn(),
-{
-    fn run(&self) {
-        serial_print!("{}...\t", core::any::type_name::<T>());
-        self();
-        serial_println!("[ok]")
-    }
 }
