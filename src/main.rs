@@ -4,8 +4,12 @@
 #![test_runner(rust_os::test_runner)]
 #![reexport_test_harness_main = "test_main"]
 
+extern crate alloc;
+
 use core::panic::PanicInfo;
 use bootloader::{BootInfo, entry_point};
+use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
+use x86_64::VirtAddr;
 
 mod vga_buffer;
 mod serial;
@@ -35,10 +39,37 @@ pub fn logo() {
 
 entry_point!(kernel_main);     // The true start of our kernel
 
-fn kernel_main(_boot_info: &'static BootInfo) -> ! {
+fn kernel_main(boot_info: &'static BootInfo) -> ! {
+    use rust_os::allocator;
+    use rust_os::memory::{self, BootInfoFrameAllocator};
     logo();     // Simple RustOS logo to show that it's loaded.
     
     rust_os::init();
+
+    let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);
+    let mut mapper = unsafe { memory::init(phys_mem_offset) };
+    let mut frame_allocator = unsafe {
+        BootInfoFrameAllocator::init(&boot_info.memory_map)
+    };
+
+    allocator::init_heap(&mut mapper, &mut frame_allocator)
+    .expect("heap initialization failed");
+
+    // Test Code
+    let heap_value = Box::new(41);
+    println!("heap_value at {:p}", heap_value);
+
+    let mut vec = Vec::new();
+    for i in 0..500 {
+        vec.push(i);
+    }
+    println!("vec at {:p}", vec.as_slice());
+
+    let reference_counted = Rc::new(vec![1, 2, 3]);
+    let cloned_reference = reference_counted.clone();
+    println!("current count is {}", Rc::strong_count(&cloned_reference));
+    core::mem::drop(reference_counted);
+    println!("reference count is {} now", Rc::strong_count(&cloned_reference));
 
     // !IMPORTANT! This stuff works, don't touch.
     #[cfg(test)]
