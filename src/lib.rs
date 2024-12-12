@@ -16,8 +16,6 @@ use core::panic::PanicInfo;
 #[cfg(test)]
 use bootloader::{entry_point, BootInfo};
 
-use x86_64::instructions::hlt;
-
 pub trait Testable {
     fn run(&self) -> ();
 }
