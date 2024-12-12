@@ -54,7 +54,7 @@ extern "x86-interrupt" fn page_fault_handler(
 extern "x86-interrupt" fn keyboard_interrupt_handler(
     _stack_frame: InterruptStackFrame)
 {
-    use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard, ScancodeSet};
+    use pc_keyboard::{layouts, DecodedKey, HandleControl, Keyboard};
     use spin::Mutex;
     use x86_64::instructions::port::Port;
 
