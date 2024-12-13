@@ -1,5 +1,5 @@
 use conquer_once::spin::OnceCell;
-use crossbeam_queue::{ArrayQueue, SegQueue};
+use crossbeam_queue::ArrayQueue;
 use crate::{println, print};
 use core::{pin::Pin, task::{Poll, Context}};
 use futures_util::{stream::Stream, StreamExt, task::AtomicWaker};
