@@ -1,4 +1,4 @@
-use core::{future::{self, Future}, pin::Pin};
+use core::{future::Future, pin::Pin};
 use core::task::{Context, Poll};
 use alloc::boxed::Box;
 
