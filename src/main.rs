@@ -10,7 +10,7 @@ use core::panic::PanicInfo;
 use bootloader::{BootInfo, entry_point};
 use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
 use x86_64::VirtAddr;
-use rust_os::task::{Task, simple_executor::SimpleExecutor};
+use rust_os::task::{keyboard, simple_executor::SimpleExecutor, Task};
 
 mod vga_buffer;
 mod serial;
@@ -74,6 +74,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 
     let mut executor = SimpleExecutor::new();
     executor.spawn(Task::new(example_task()));
+    executor.spawn(Task::new(keyboard::print_keypresses()));
     executor.run();
 
     // !IMPORTANT! This stuff works, don't touch.
