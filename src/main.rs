@@ -10,6 +10,7 @@ use core::panic::PanicInfo;
 use bootloader::{BootInfo, entry_point};
 use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
 use x86_64::VirtAddr;
+use rust_os::task::{Task, simple_executor::SimpleExecutor};
 
 mod vga_buffer;
 mod serial;
@@ -71,6 +72,10 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     core::mem::drop(reference_counted);
     println!("reference count is {} now", Rc::strong_count(&cloned_reference));
 
+    let mut executor = SimpleExecutor::new();
+    executor.spawn(Task::new(example_task()));
+    executor.run();
+
     // !IMPORTANT! This stuff works, don't touch.
     #[cfg(test)]
     test_main();
@@ -83,4 +88,13 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
 #[test_case]
 fn trivial_assertion() {
     assert_eq!(1, 1);                   // Assert that 1 = 1
+}
+
+async fn async_number() -> u32 {
+    42
+}
+
+async fn example_task() {
+    let number = async_number().await;
+    println!("async number: {}", number);
 }
