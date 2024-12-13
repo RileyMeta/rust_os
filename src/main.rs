@@ -10,7 +10,7 @@ use core::panic::PanicInfo;
 use bootloader::{BootInfo, entry_point};
 use alloc::{boxed::Box, vec, vec::Vec, rc::Rc};
 use x86_64::VirtAddr;
-use rust_os::task::{keyboard, simple_executor::SimpleExecutor, Task};
+use rust_os::task::{keyboard, executor::Executor, Task};
 
 mod vga_buffer;
 mod serial;
@@ -72,7 +72,7 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     core::mem::drop(reference_counted);
     println!("reference count is {} now", Rc::strong_count(&cloned_reference));
 
-    let mut executor = SimpleExecutor::new();
+    let mut executor = Executor::new();
     executor.spawn(Task::new(example_task()));
     executor.spawn(Task::new(keyboard::print_keypresses()));
     executor.run();
@@ -81,8 +81,8 @@ fn kernel_main(boot_info: &'static BootInfo) -> ! {
     #[cfg(test)]
     test_main();
 
-    println!("It did not crash!");
-    rust_os::hlt_loop();
+    // println!("It did not crash!");
+    // rust_os::hlt_loop();
 }
 
 // Trivial Assertion is a basic test
